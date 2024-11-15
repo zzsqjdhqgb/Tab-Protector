@@ -1,0 +1,33 @@
+{
+    "name": "Tab Protector",
+    "version": "0.0.0.1",
+    "manifest_version": 3,
+    "description": "保护标签页不被误触关闭",
+    "icons": {
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png",
+        "64": "icons/icon64.png",
+        "128": "icons/icon128.png",
+        "256": "icons/icon256.png",
+        "512": "icons/icon512.png",
+        "1024": "icons/icon1024.png"
+    },
+    "permissions": [],
+    "background": {
+        "service_worker": "/background/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "/content/content.js"
+            ]
+        }
+    ],
+    "action": {
+        "default_popup": "popup/index.html"
+    }
+}

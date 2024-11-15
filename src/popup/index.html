@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lock Control Panel</title>
+    <style>
+        .lock-panel {
+            margin: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 225px;
+            height: 45px;
+            background-color: #fff;
+            border-radius: 8px;
+            padding-left: 15px;
+            /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .lock-icon {
+            height: 100%;
+            width: 25px;
+            height: 25px;
+        }
+
+        .status-text {
+            padding-left: 15px;
+            flex-grow: 1;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .lock-panel.unlocked {
+            --main-color: #007bff;
+        }
+        .lock-panel.locked {
+            --main-color: #28a745;
+        }
+        
+        .toggle-btn {
+            padding-left: 15px;
+            padding-right: 15px;
+            border-radius: 0px 8px 8px 0px;
+            font-size: 1.2em;
+            font-weight: bold;
+            height: 100%;
+            cursor: pointer;
+            border: none;
+            background-color: #fff;
+            color: var(--main-color);
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--main-color);
+            color: #fff;
+        }
+        .lock-panel.unlocked {
+            box-shadow: 0 0 10px #007bff;
+        }
+
+        .lock-panel.locked {
+            box-shadow: 0 0 10px #28a745;
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; width: 100%; height: 100%;">
+
+    <div class="lock-panel" id="lock-panel">
+        <img src="./img/lock.svg" alt="Lock" class="lock-icon">
+        <div class="status-text" id="status-text"></div>
+        <button id="change_btn" class="btn toggle-btn">切换</button>
+    </div>
+
+    <!-- 引入Bootstrap Bundle with Popper -->
+    <!-- <script src="./lib/bootstrap.bundle.min.js"></script> -->
+    <script src="./js/main.js"></script>
+
+</body>
+
+</html>
