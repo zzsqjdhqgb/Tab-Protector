@@ -33,13 +33,18 @@
             font-weight: bold;
         }
 
+        .lock-panel {
+            --main-color: #868686;
+        }
+
         .lock-panel.unlocked {
             --main-color: #007bff;
         }
+
         .lock-panel.locked {
             --main-color: #28a745;
         }
-        
+
         .toggle-btn {
             padding-left: 15px;
             padding-right: 15px;
@@ -58,12 +63,9 @@
             background-color: var(--main-color);
             color: #fff;
         }
-        .lock-panel.unlocked {
-            box-shadow: 0 0 10px #007bff;
-        }
 
-        .lock-panel.locked {
-            box-shadow: 0 0 10px #28a745;
+        .lock-panel {
+            box-shadow: 0 0 10px var(--main-color);
         }
     </style>
 </head>
@@ -72,8 +74,8 @@
 
     <div class="lock-panel" id="lock-panel">
         <img src="./img/lock.svg" alt="Lock" class="lock-icon">
-        <div class="status-text" id="status-text"></div>
-        <button id="change_btn" class="btn toggle-btn">切换</button>
+        <div class="status-text" id="status-text">未连接</div>
+        <button id="change_btn" class="btn toggle-btn" style="display: none;">切换</button>
     </div>
 
     <!-- 引入Bootstrap Bundle with Popper -->

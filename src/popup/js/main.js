@@ -1,6 +1,8 @@
 function UpdatePanel(stat) {
     var lockPanel = document.getElementById('lock-panel');
     var statusText = document.getElementById('status-text');
+    let changeBtn = document.getElementById("change_btn")
+    changeBtn.style.display = "block";
     if (stat) {
         if (lockPanel.classList.contains('unlocked')) {
             lockPanel.classList.remove('unlocked');
@@ -16,21 +18,23 @@ function UpdatePanel(stat) {
     }
 }
 
-const channel = new BroadcastChannel('background-popup-channel');
-channel.onmessage = function(event) {
-    UpdatePanel(event.data.stat);
-};
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.msg_type == "ANSWER") {
+        UpdatePanel(request.stat);
+    }
+});
+
 
 const fail_chan = new BroadcastChannel('tell-fail');
-fail_chan.onmessage = function(event) {
+fail_chan.onmessage = function (event) {
     console.log("recv fail");
     var lockPanel = document.getElementById('lock-panel');
     var statusText = document.getElementById('status-text');
     let changeBtn = document.getElementById("change_btn");
     lockPanel.style.boxShadow = "0 0 10px #ff0000";
     statusText.style.color = "#ff0000";
-    statusText.textContent = "无法锁定";
-    changeBtn.style.display = "none"
+    statusText.textContent = event.data.msg;
+    changeBtn.style.display = "none";
 };
 
 async function Init() {
@@ -41,9 +45,9 @@ async function toggleLock() {
     chrome.runtime.sendMessage({ msg_type: "CHANGE" });
 }
 
-window.addEventListener('blur', function() {
+window.addEventListener('blur', function () {
     console.log('页面失去焦点');
-    window.close();
+    // window.close();
 });
 
 document.getElementById("change_btn").addEventListener("click", toggleLock);

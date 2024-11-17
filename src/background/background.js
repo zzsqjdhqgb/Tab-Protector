@@ -1,5 +1,3 @@
-let tabList = {};
-
 // msg_type: "SET"
 //     lock_stat : bool
 // 
@@ -15,10 +13,15 @@ async function GetCurTabId() {
     return tabs[0].id;
 }
 
-async function UpdateContentScript(tab, stat) {
+async function ChangeContentScript(tab) {
     await chrome.tabs.sendMessage(tab, {
-        msg_type: "SET",
-        lock_stat: stat
+        msg_type: "SWITCH"
+    });
+}
+
+async function SetContentScript(tab) {
+    await chrome.tabs.sendMessage(tab, {
+        msg_type: "SET"
     });
 }
 
@@ -37,88 +40,49 @@ async function ConnectContentScript(tab) {
 }
 
 const fail_chan = new BroadcastChannel('tell-fail');
-function PopupFail() {
+function PopupFail(msg) {
     console.log("fail");
-    fail_chan.postMessage({ msg: "fail" });
+    fail_chan.postMessage({ msg: msg });
 }
 
 async function ConnectTab() {
-    try {
-        let tab = await GetCurTabId();
-        if (!tabList.hasOwnProperty(tab)) {
-            tabList[tab] = {
-                on_lock: false
-            };
-            // console.log(`[handled] current tab unexist, id: ${tab}`);
-            // PopupFail();
-            // return false;
-        }
-        let res = await ConnectContentScript(tab);
-        if (res) return true;
-        PopupFail();
-        return false;
-    } catch {
-        PopupFail();
-        return false;
-    }
+    let tab = await GetCurTabId();
+    let res = await ConnectContentScript(tab);
+    if (res) return true;
+    PopupFail("无法锁定");
+    return false;
 }
 
 async function GetTabStat() {
     let tab = await GetCurTabId();
-    if (!tabList.hasOwnProperty(tab)) {
-        console.error(`current tab unexist, id: ${tab}`);
-        return;
-    }
-    await UpdateContentScript(tab, tabList[tab].on_lock);
-    return tabList[tab].on_lock;
+    await SetContentScript(tab)
 }
 
 async function ChangeTabStat() {
     let tab = await GetCurTabId();
-    if (!tabList.hasOwnProperty(tab)) {
-        console.error(`current tab unexist, id: ${tab}`);
-        return;
-    }
-    tabList[tab].on_lock = !tabList[tab].on_lock;
-    await UpdateContentScript(tab, tabList[tab].on_lock);
-    return tabList[tab].on_lock;
-}
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (!tabList.hasOwnProperty(tabId)) {
-        tabList[tabId] = {
-            on_lock: false
-        };
-    }
-});
-
-chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    if (tabList.hasOwnProperty(tabId)) {
-        delete tabList[tabId];
-    }
-});
-
-const channel = new BroadcastChannel('background-popup-channel');
-function TellPopup(stat) {
-    channel.postMessage({ stat: stat });
+    await ChangeContentScript(tab);
 }
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.msg_type != "CHANGE") {
         return;
     }
-    if (!await ConnectTab()) return;
-    let res = await ChangeTabStat();
-    console.log("Current status: ", res);
-    TellPopup(res);
+    try {
+        if (!await ConnectTab()) return;
+        await ChangeTabStat();
+    } catch {
+        PopupFail("未知错误");
+    }
 });
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.msg_type != "QUERY") {
         return;
     }
-    if (!await ConnectTab()) return;
-    let res = await GetTabStat();
-    console.log("Current status: ", res);
-    TellPopup(res);
+    try {
+        if (!await ConnectTab()) return;
+        await GetTabStat();
+    } catch {
+        PopupFail("未知错误");
+    }
 });
